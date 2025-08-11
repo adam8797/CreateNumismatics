@@ -76,6 +76,8 @@ public class DiscreteCoinBag implements CoinBag {
         return NumismaticsItems.getCoin(coin).asStack(amt);
     }
 
+    public Map<Coin, Integer> asMap() { return this.coins; }
+
     @Override
     public int getValue() {
         return value;
@@ -114,6 +116,20 @@ public class DiscreteCoinBag implements CoinBag {
 
     public static DiscreteCoinBag of(Map<Coin, Integer> coins) {
         return new DiscreteCoinBag(coins);
+    }
+
+    public static DiscreteCoinBag of(int totalSpurValue)
+    {
+        var bag = new DiscreteCoinBag();
+        int spurs = totalSpurValue;
+        for (var coin : Coin.byValueDescending)
+        {
+            var tuple = coin.convert(spurs);
+            if (tuple.getFirst() != 0)
+                bag.add(coin, tuple.getFirst());
+            spurs = tuple.getSecond();
+        }
+        return bag;
     }
 
     public static DiscreteCoinBag of() {

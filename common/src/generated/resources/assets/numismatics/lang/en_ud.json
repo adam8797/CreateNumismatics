@@ -34,6 +34,8 @@
   "block.numismatics.vendor.tooltip.trade_item": "ǝpɐɹ⟘ oʇ ɯǝʇI",
   "command.numismatics.arguments.enum.invalid": "%s :ǝɹɐ sǝnןɐʌ pıןɐΛ ˙,%s, ǝnןɐʌ ɯnuǝ pıןɐʌuI :ɹoɹɹƎ",
   "gui.numismatics.bank_terminal.balance": "¤%s '%s %s :ǝɔuɐןɐᗺ",
+  "gui.numismatics.checkout_screen.header": "ʇnoʞɔǝɥƆ",
+  "gui.numismatics.checkout_screen.total": "¤%s '%s %s :ןɐʇo⟘ ɹǝpɹO",
   "gui.numismatics.trust_list": "ʇsıꞀ ʇsnɹ⟘",
   "gui.numismatics.vendor.count": ")x%s( ",
   "gui.numismatics.vendor.full": "ןןnɟ sı ɹopuǝΛ",

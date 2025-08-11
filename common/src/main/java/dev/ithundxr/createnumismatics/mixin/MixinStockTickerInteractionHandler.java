@@ -1,0 +1,69 @@
+package dev.ithundxr.createnumismatics.mixin;
+
+import com.llamalad7.mixinextras.sugar.Local;
+import com.simibubi.create.AllSoundEvents;
+import com.simibubi.create.content.logistics.packager.InventorySummary;
+import com.simibubi.create.content.logistics.packagerLink.LogisticallyLinkedBehaviour;
+import com.simibubi.create.content.logistics.stockTicker.PackageOrder;
+import com.simibubi.create.content.logistics.stockTicker.StockTickerBlockEntity;
+import com.simibubi.create.content.logistics.stockTicker.StockTickerInteractionHandler;
+import com.simibubi.create.content.logistics.tableCloth.ShoppingListItem;
+import com.simibubi.create.foundation.utility.CreateLang;
+import dev.ithundxr.createnumismatics.Numismatics;
+import dev.ithundxr.createnumismatics.content.backend.BankAccount;
+import dev.ithundxr.createnumismatics.content.backend.Coin;
+import dev.ithundxr.createnumismatics.content.bank.CardItem;
+import dev.ithundxr.createnumismatics.content.checkout.DeferredCheckoutOrder;
+import dev.ithundxr.createnumismatics.content.coins.CoinItem;
+import dev.ithundxr.createnumismatics.content.depositor.AbstractDepositorBlockEntity;
+import dev.ithundxr.createnumismatics.util.Utils;
+import net.createmod.catnip.data.Iterate;
+import net.minecraft.ChatFormatting;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Unique;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+
+import javax.smartcardio.Card;
+import java.util.Arrays;
+
+@Mixin(StockTickerInteractionHandler.class)
+public class MixinStockTickerInteractionHandler
+{
+    @Inject(method = "interactWithShop", at = @At(value = "INVOKE", target = "Lcom/simibubi/create/content/logistics/stockTicker/StockTickerBlockEntity;getAccurateSummary()Lcom/simibubi/create/content/logistics/packager/InventorySummary;"), cancellable = true)
+    private static void interactWithShop(
+            Player player,
+            Level level,
+            BlockPos targetPos,
+            ItemStack mainHandItem,
+            CallbackInfo ci,
+            @Local ShoppingListItem.ShoppingList shoppingList,
+            @Local StockTickerBlockEntity tickerBE
+    )
+    {
+
+        // Build the deferred order and check to see if all preconditions are being met
+        var deferredOrder = Numismatics.DEFERRED_ORDERS.deferOrder(shoppingList, level, (ServerPlayer) player, tickerBE);
+        if (!deferredOrder.isTransactionValid())
+        {
+            // Transaction isn't valid, backout!
+            Numismatics.DEFERRED_ORDERS.voidOrder(deferredOrder);
+            return;
+        }
+
+        // At this point, we've determined this is a numismatics transaction,
+        // and we will *not* be allowing the standard trade to complete now. We must defer it
+        ci.cancel();
+
+        Utils.openScreen((ServerPlayer) player, deferredOrder, deferredOrder::sendToMenu);
+    }
+
+}

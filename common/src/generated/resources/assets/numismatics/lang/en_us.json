@@ -34,6 +34,8 @@
   "block.numismatics.vendor.tooltip.trade_item": "Item to Trade",
   "command.numismatics.arguments.enum.invalid": "Error: Invalid enum value '%s'. Valid values are: %s",
   "gui.numismatics.bank_terminal.balance": "Balance: %s %s, %s¤",
+  "gui.numismatics.checkout_screen.header": "Checkout",
+  "gui.numismatics.checkout_screen.total": "Order Total: %s %s, %s¤",
   "gui.numismatics.trust_list": "Trust List",
   "gui.numismatics.vendor.count": " (%sx)",
   "gui.numismatics.vendor.full": "Vendor is full",
