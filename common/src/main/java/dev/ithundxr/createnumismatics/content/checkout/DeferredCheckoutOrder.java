@@ -243,7 +243,7 @@ public class DeferredCheckoutOrder implements MenuProvider {
             int overpay = breaker.value - remaining;
 
             // Make change
-            changeToAdd = DiscreteCoinBag.of(overpay);
+            changeToAdd = DiscreteCoinBag.ofGreedy(overpay);
             overpay -= changeToAdd.getValue();
             // If we couldn't form exact change (shouldn't happen with canonical set), fail safely
             if (overpay != 0) {
@@ -312,7 +312,7 @@ public class DeferredCheckoutOrder implements MenuProvider {
         if (account != null) {
             account.deposit(costInSpurs);
         } else {
-            var coins = DiscreteCoinBag.of(costInSpurs);
+            var coins = DiscreteCoinBag.ofGreedy(costInSpurs);
             for (var c : Coin.values()) {
                 depositor.addCoin(c, coins.getDiscrete(c));
             }

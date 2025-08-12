@@ -118,7 +118,7 @@ public class DiscreteCoinBag implements CoinBag {
         return new DiscreteCoinBag(coins);
     }
 
-    public static DiscreteCoinBag of(int totalSpurValue) {
+    public static DiscreteCoinBag ofGreedy(int totalSpurValue) {
         var bag = new DiscreteCoinBag();
         int spurs = totalSpurValue;
         for (var coin : Coin.byValueDescending)
