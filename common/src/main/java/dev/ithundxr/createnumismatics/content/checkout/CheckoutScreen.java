@@ -86,7 +86,7 @@ public class CheckoutScreen extends AbstractSimiContainerScreen<CheckoutMenu> {
             return;
 
         var inventory = minecraft.player.getInventory();
-        var coinsOnPlayer = coinsInPlayerInventory(inventory);
+        int coinsOnPlayer = coinsInPlayerInventory(inventory);
         payWithCoinsButton.active = menu.contentHolder.costInSpurs <= coinsOnPlayer;
     }
 
@@ -120,8 +120,8 @@ public class CheckoutScreen extends AbstractSimiContainerScreen<CheckoutMenu> {
     }
 
     private int coinsInPlayerInventory(Inventory inv) {
-        var tally = 0;
-        for (var i = 0; i < inv.getContainerSize(); i++) {
+        int tally = 0;
+        for (int i = 0; i < inv.getContainerSize(); i++) {
             var stack = inv.getItem(i);
             if (stack.getItem() instanceof CoinItem ci) {
                 tally += ci.coin.toSpurs(stack.getCount());
