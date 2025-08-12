@@ -176,17 +176,6 @@ public class DeferredCheckoutOrder implements MenuProvider {
         return true;
     }
 
-    /**
-     * Attempts to remove the specified number of spurs from the player's inventory.
-     * - Uses the largest denominations first (greedy).
-     * - If exact change is not possible with available smaller coins, it takes one larger coin
-     * and gives change back in smaller coins.
-     * - If still impossible (not enough value in inventory), returns false and makes no changes.
-     *
-     * @param player        the player
-     * @param spursToRemove amount to pay, in spurs (must be >= 0)
-     * @return true if payment succeeded (inventory adjusted and change returned), false otherwise
-     */
     public boolean tryPayInSpurs(Inventory inventory, int spursToRemove) {
         if (spursToRemove <= 0) {
             return true; // nothing to pay
