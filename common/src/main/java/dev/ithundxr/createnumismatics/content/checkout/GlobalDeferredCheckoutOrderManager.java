@@ -11,12 +11,10 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-public class GlobalDeferredCheckoutOrderManager
-{
+public class GlobalDeferredCheckoutOrderManager {
     public Map<UUID, DeferredCheckoutOrder> deferredOrders;
 
-    public GlobalDeferredCheckoutOrderManager()
-    {
+    public GlobalDeferredCheckoutOrderManager() {
         deferredOrders = new HashMap<>();
     }
 
@@ -35,22 +33,19 @@ public class GlobalDeferredCheckoutOrderManager
         }
     }
 
-    public DeferredCheckoutOrder deferOrder(ShoppingListItem.ShoppingList list, Level level, ServerPlayer player, StockTickerBlockEntity stockTicker)
-    {
+    public DeferredCheckoutOrder deferOrder(ShoppingListItem.ShoppingList list, Level level, ServerPlayer player, StockTickerBlockEntity stockTicker) {
         warnIfClient();
         var order = new DeferredCheckoutOrder(UUID.randomUUID(), list, level, player, stockTicker);
         deferredOrders.put(order.id, order);
         return order;
     }
 
-    public DeferredCheckoutOrder getDeferredOrder(UUID id)
-    {
+    public DeferredCheckoutOrder getDeferredOrder(UUID id) {
         warnIfClient();
         return deferredOrders.get(id);
     }
 
-    public void voidOrder(DeferredCheckoutOrder order)
-    {
+    public void voidOrder(DeferredCheckoutOrder order) {
         warnIfClient();
         order.finalized = true;
         deferredOrders.remove(order.id);

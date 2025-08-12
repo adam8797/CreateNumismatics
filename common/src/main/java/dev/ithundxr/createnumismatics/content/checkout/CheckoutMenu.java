@@ -1,16 +1,9 @@
 package dev.ithundxr.createnumismatics.content.checkout;
 
-import com.mojang.datafixers.types.templates.Check;
 import com.simibubi.create.foundation.gui.menu.MenuBase;
-import dev.ithundxr.createnumismatics.Numismatics;
-import dev.ithundxr.createnumismatics.content.backend.BankAccount;
-import dev.ithundxr.createnumismatics.content.backend.Coin;
-import dev.ithundxr.createnumismatics.content.bank.BankMenu;
 import dev.ithundxr.createnumismatics.content.bank.CardItem;
 import dev.ithundxr.createnumismatics.content.bank.CardSlot;
 import dev.ithundxr.createnumismatics.content.coins.CoinItem;
-import dev.ithundxr.createnumismatics.content.coins.SlotInputMergingCoinBag;
-import dev.ithundxr.createnumismatics.content.coins.SlotOutputMergingCoinBag;
 import dev.ithundxr.createnumismatics.registry.NumismaticsTags;
 import dev.ithundxr.createnumismatics.util.Utils;
 import net.minecraft.network.RegistryFriendlyByteBuf;
@@ -31,8 +24,7 @@ import java.util.UUID;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-public class CheckoutMenu extends MenuBase<DeferredCheckoutOrder>
-{
+public class CheckoutMenu extends MenuBase<DeferredCheckoutOrder> {
     protected ContainerData dataAccess;
     private CheckoutMenu.CardSwitchContainer cardSwitchContainer;
     protected UUID currentCardUUID = Utils.emptyUUID;
@@ -56,7 +48,8 @@ public class CheckoutMenu extends MenuBase<DeferredCheckoutOrder>
     }
 
     @Override
-    protected void initAndReadInventory(DeferredCheckoutOrder contentHolder) {}
+    protected void initAndReadInventory(DeferredCheckoutOrder contentHolder) {
+    }
 
     @Override
     protected void addSlots() {
@@ -71,7 +64,8 @@ public class CheckoutMenu extends MenuBase<DeferredCheckoutOrder>
     }
 
     @Override
-    protected void saveData(DeferredCheckoutOrder contentHolder) {}
+    protected void saveData(DeferredCheckoutOrder contentHolder) {
+    }
 
     @Override
     public void removed(Player playerIn) {
@@ -160,7 +154,8 @@ public class CheckoutMenu extends MenuBase<DeferredCheckoutOrder>
         }
 
         @Override
-        public void setChanged() {}
+        public void setChanged() {
+        }
 
         @Override
         public boolean stillValid(@NotNull Player player) {

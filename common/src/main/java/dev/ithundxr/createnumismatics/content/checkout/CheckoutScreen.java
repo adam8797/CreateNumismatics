@@ -1,7 +1,6 @@
 package dev.ithundxr.createnumismatics.content.checkout;
 
 import com.google.common.collect.ImmutableList;
-import com.mojang.blaze3d.vertex.PoseStack;
 import com.simibubi.create.AllBlocks;
 import com.simibubi.create.foundation.gui.AllGuiTextures;
 import com.simibubi.create.foundation.gui.AllIcons;
@@ -10,7 +9,6 @@ import com.simibubi.create.foundation.gui.widget.IconButton;
 import dev.ithundxr.createnumismatics.Numismatics;
 import dev.ithundxr.createnumismatics.content.backend.Coin;
 import dev.ithundxr.createnumismatics.content.coins.CoinItem;
-import dev.ithundxr.createnumismatics.registry.NumismaticsBlocks;
 import dev.ithundxr.createnumismatics.registry.NumismaticsGuiTextures;
 import dev.ithundxr.createnumismatics.registry.packets.DeferredCheckoutResolutionPacket;
 import dev.ithundxr.createnumismatics.util.TextUtils;
@@ -21,7 +19,6 @@ import net.createmod.catnip.platform.CatnipServices;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.renderer.Rect2i;
-import net.minecraft.core.UUIDUtil;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.ItemStack;
@@ -29,10 +26,8 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.UUID;
 
-public class CheckoutScreen extends AbstractSimiContainerScreen<CheckoutMenu>
-{
+public class CheckoutScreen extends AbstractSimiContainerScreen<CheckoutMenu> {
     private final NumismaticsGuiTextures background = NumismaticsGuiTextures.CHECKOUT_SCREEN;
     private final ItemStack renderedItem = AllBlocks.LIT_BLAZE_BURNER.asStack();
     private List<Rect2i> extraAreas = Collections.emptyList();
@@ -80,15 +75,13 @@ public class CheckoutScreen extends AbstractSimiContainerScreen<CheckoutMenu>
     }
 
     @Override
-    protected void containerTick()
-    {
+    protected void containerTick() {
         super.containerTick();
         updatePayWithCoinsButton();
         updatePayWithCardButton();
     }
 
-    private void updatePayWithCoinsButton()
-    {
+    private void updatePayWithCoinsButton() {
         if (minecraft == null || minecraft.player == null)
             return;
 
@@ -97,8 +90,7 @@ public class CheckoutScreen extends AbstractSimiContainerScreen<CheckoutMenu>
         payWithCoinsButton.active = menu.contentHolder.costInSpurs <= coinsOnPlayer;
     }
 
-    private void updatePayWithCardButton()
-    {
+    private void updatePayWithCardButton() {
         payWithCardButton.active = !menu.currentCardUUID.equals(Utils.emptyUUID);
     }
 
@@ -115,28 +107,23 @@ public class CheckoutScreen extends AbstractSimiContainerScreen<CheckoutMenu>
         onConfirmTransaction(CheckoutPaymentMethod.CARD);
     }
 
-    private void onConfirmTransaction(CheckoutPaymentMethod method)
-    {
+    private void onConfirmTransaction(CheckoutPaymentMethod method) {
         Numismatics.LOGGER.info("Submitting resolution (APPROVED) of deferred order {}", this.menu.contentHolder.id);
         CatnipServices.NETWORK.sendToServer(new DeferredCheckoutResolutionPacket(this.menu.contentHolder.id, method, menu.currentCardUUID));
         super.onClose();
     }
 
-    private void onCancelTransaction()
-    {
+    private void onCancelTransaction() {
         Numismatics.LOGGER.info("Submitting resolution (DENIED) of deferred order {}", this.menu.contentHolder.id);
         CatnipServices.NETWORK.sendToServer(new DeferredCheckoutResolutionPacket(this.menu.contentHolder.id, CheckoutPaymentMethod.UNDEFINED, Utils.emptyUUID));
         super.onClose();
     }
 
-    private int coinsInPlayerInventory(Inventory inv)
-    {
+    private int coinsInPlayerInventory(Inventory inv) {
         var tally = 0;
-        for (var i = 0; i < inv.getContainerSize(); i++)
-        {
+        for (var i = 0; i < inv.getContainerSize(); i++) {
             var stack = inv.getItem(i);
-            if (stack.getItem() instanceof CoinItem ci)
-            {
+            if (stack.getItem() instanceof CoinItem ci) {
                 tally += ci.coin.toSpurs(stack.getCount());
             }
         }

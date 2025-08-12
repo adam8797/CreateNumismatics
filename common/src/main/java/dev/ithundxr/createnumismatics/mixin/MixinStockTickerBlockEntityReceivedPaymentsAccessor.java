@@ -6,8 +6,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Accessor;
 
 @Mixin(StockTickerBlockEntity.class)
-public interface MixinStockTickerBlockEntityReceivedPaymentsAccessor
-{
+public interface MixinStockTickerBlockEntityReceivedPaymentsAccessor {
     @Accessor
     SmartInventory getReceivedPayments();
 }

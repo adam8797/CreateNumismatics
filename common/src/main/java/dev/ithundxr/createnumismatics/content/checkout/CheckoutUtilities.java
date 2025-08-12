@@ -13,7 +13,6 @@ import dev.ithundxr.createnumismatics.content.coins.CoinItem;
 import net.createmod.catnip.data.Couple;
 import net.createmod.catnip.data.Iterate;
 import net.minecraft.ChatFormatting;
-import net.minecraft.server.packs.repository.Pack;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
@@ -24,15 +23,12 @@ import net.neoforged.neoforge.items.ItemHandlerHelper;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CheckoutUtilities
-{
-    public static int determineCoinCostInSpurs(ShoppingListItem.ShoppingList list, Level level)
-    {
+public class CheckoutUtilities {
+    public static int determineCoinCostInSpurs(ShoppingListItem.ShoppingList list, Level level) {
         Couple<InventorySummary> bakeEntries = list.bakeEntries(level, null);
         InventorySummary paymentEntries = bakeEntries.getSecond();
         int cost = 0;
-        for (var stack : paymentEntries.getStacksByCount())
-        {
+        for (var stack : paymentEntries.getStacksByCount()) {
             if (stack.stack.getItem() instanceof CoinItem coinItem) {
                 cost += coinItem.coin.toSpurs(stack.count);
             }
@@ -40,16 +36,14 @@ public class CheckoutUtilities
         return cost;
     }
 
-    public static void denyShopInteraction(Level level, Player player)
-    {
+    public static void denyShopInteraction(Level level, Player player) {
         AllSoundEvents.DENY.playOnServer(level, player.blockPosition());
         CreateLang.translate("stock_keeper.stock_level_too_low")
                 .style(ChatFormatting.RED)
                 .sendStatus(player);
     }
 
-    public static void shopInteractionSubmitToNetwork(StockTickerBlockEntity tickerBE, PackageOrder order, Player player, Level level)
-    {
+    public static void shopInteractionSubmitToNetwork(StockTickerBlockEntity tickerBE, PackageOrder order, Player player, Level level) {
         var mainHandItem = player.getMainHandItem();
         tickerBE.broadcastPackageRequest(LogisticallyLinkedBehaviour.RequestType.PLAYER, order, null, ShoppingListItem.getAddress(mainHandItem));
         player.setItemInHand(InteractionHand.MAIN_HAND, ItemStack.EMPTY);
@@ -57,8 +51,7 @@ public class CheckoutUtilities
             AllSoundEvents.STOCK_TICKER_TRADE.playOnServer(level, tickerBE.getBlockPos());
     }
 
-    public static boolean checkOrderPreconditions(StockTickerBlockEntity tickerBE, PackageOrder order, Level level, Player player)
-    {
+    public static boolean checkOrderPreconditions(StockTickerBlockEntity tickerBE, PackageOrder order, Level level, Player player) {
         // Must be up-to-date
         tickerBE.getAccurateSummary();
 
@@ -80,8 +73,7 @@ public class CheckoutUtilities
             Player player,
             InventorySummary paymentEntries,
             PackageOrder order,
-            SmartInventory receivedPayments)
-    {
+            SmartInventory receivedPayments) {
         if (!checkOrderPreconditions(tickerBE, order, level, player))
             return false;
 
@@ -139,8 +131,7 @@ public class CheckoutUtilities
         return true;
     }
 
-    public static void denyPurchase(Level level, Player player, String langKey)
-    {
+    public static void denyPurchase(Level level, Player player, String langKey) {
         AllSoundEvents.DENY.playOnServer(level, player.blockPosition());
         CreateLang.translate(langKey)
                 .style(ChatFormatting.RED)
