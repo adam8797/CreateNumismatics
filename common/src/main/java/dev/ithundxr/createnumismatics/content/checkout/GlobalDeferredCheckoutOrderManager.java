@@ -12,11 +12,8 @@ import java.util.Map;
 import java.util.UUID;
 
 public class GlobalDeferredCheckoutOrderManager {
-    public Map<UUID, DeferredCheckoutOrder> deferredOrders;
 
-    public GlobalDeferredCheckoutOrderManager() {
-        deferredOrders = new HashMap<>();
-    }
+    private Map<UUID, DeferredCheckoutOrder> deferredOrders = new HashMap<>();
 
     private void warnIfClient() {
         if (Thread.currentThread().getName().equals("Render thread")) {
