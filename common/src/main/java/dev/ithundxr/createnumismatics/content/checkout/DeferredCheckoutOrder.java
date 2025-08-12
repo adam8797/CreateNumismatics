@@ -32,34 +32,17 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.UUID;
 
-public class DeferredCheckoutOrder implements MenuProvider {
+public class DeferredCheckoutOrder{
     public UUID id;
-    public InventorySummary itemCost;
     public int costInSpurs;
-    public PackageOrder deferredOrder;
-    public Level level;
-    public ServerPlayer player;
-    public StockTickerBlockEntity stockTicker;
-    public boolean finalized = false;
-    public boolean clientSide;
 
-    public final ContainerData dataAccess = new ContainerData() {
-        @Override
-        public int get(int index) {
-            //Numismatics.LOGGER.warn("BankAccount dataAccess#get called with index " + index + " (Account: "+BankAccount.this+"), returning "+balance);
-            return costInSpurs;
-        }
+    private boolean closed = false;
 
-        @Override
-        public void set(int index, int value) {
-            Numismatics.LOGGER.warn("BankAccount dataAccess#set called with index " + index + " (Account: " + DeferredCheckoutOrder.this + "), setting balance to " + value);
-        }
-
-        @Override
-        public int getCount() {
-            return 1;
-        }
-    };
+    private final StockTickerBlockEntity stockTicker;
+    private final ServerPlayer player;
+    private final Level level;
+    private final InventorySummary itemCost;
+    private final PackageOrder deferredOrder;
 
     public DeferredCheckoutOrder(UUID orderId, ShoppingListItem.ShoppingList list, Level level, ServerPlayer player, StockTickerBlockEntity stockTicker) {
         Couple<InventorySummary> bakeEntries = list.bakeEntries(level, null);
@@ -81,20 +64,10 @@ public class DeferredCheckoutOrder implements MenuProvider {
         this.level = level;
         this.player = player;
         this.stockTicker = stockTicker;
-        this.clientSide = false;
-    }
-
-    private DeferredCheckoutOrder(UUID orderId, int costInSpurs) {
-        this.clientSide = true;
-        this.id = orderId;
-        this.costInSpurs = costInSpurs;
     }
 
     public boolean isTransactionValid() {
-        if (finalized)
-            return false;
-
-        if (clientSide)
+        if (closed)
             return false;
 
         if (level.isClientSide)
@@ -109,8 +82,7 @@ public class DeferredCheckoutOrder implements MenuProvider {
         if (costInSpurs == 0)
             return false;
 
-        var depositor = getDepositor(stockTicker.getBlockPos(), level);
-        if (depositor == null)
+        if (getDepositor() == null)
             return false;
 
         return true;
@@ -307,29 +279,13 @@ public class DeferredCheckoutOrder implements MenuProvider {
         }
     }
 
-
-    // Menu components
-
-    @Override
-    public Component getDisplayName() {
-        return Component.translatable("gui.numismatics.checkout_screen.header");
+    public void close()
+    {
+        closed = true;
     }
 
-    @Override
-    public @Nullable AbstractContainerMenu createMenu(int i, Inventory inventory, Player player) {
-        return new CheckoutMenu(NumismaticsMenuTypes.CHECKOUT.get(), i, inventory, this, dataAccess);
-    }
-
-    public void sendToMenu(FriendlyByteBuf buf) {
-        buf.writeUUID(this.id);
-        buf.writeVarInt(this.costInSpurs);
-    }
-
-    public static DeferredCheckoutOrder clientSide(FriendlyByteBuf buf) {
-        return new DeferredCheckoutOrder(buf.readUUID(), buf.readVarInt());
-    }
-
-    public static boolean isPowerOfTwo(int x) {
-        return (x & (x - 1)) == 0;
+    public boolean isClosed()
+    {
+        return closed;
     }
 }

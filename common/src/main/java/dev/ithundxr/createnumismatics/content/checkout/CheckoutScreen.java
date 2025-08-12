@@ -87,7 +87,7 @@ public class CheckoutScreen extends AbstractSimiContainerScreen<CheckoutMenu> {
 
         var inventory = minecraft.player.getInventory();
         int coinsOnPlayer = coinsInPlayerInventory(inventory);
-        payWithCoinsButton.active = menu.contentHolder.costInSpurs <= coinsOnPlayer;
+        payWithCoinsButton.active = menu.contentHolder.costInSpurs() <= coinsOnPlayer;
     }
 
     private void updatePayWithCardButton() {
@@ -108,14 +108,14 @@ public class CheckoutScreen extends AbstractSimiContainerScreen<CheckoutMenu> {
     }
 
     private void onConfirmTransaction(CheckoutPaymentMethod method) {
-        Numismatics.LOGGER.info("Submitting resolution (APPROVED) of deferred order {}", this.menu.contentHolder.id);
-        CatnipServices.NETWORK.sendToServer(new DeferredCheckoutResolutionPacket(this.menu.contentHolder.id, method, menu.currentCardUUID));
+        Numismatics.LOGGER.info("Submitting resolution (APPROVED) of deferred order {}", this.menu.contentHolder.id());
+        CatnipServices.NETWORK.sendToServer(new DeferredCheckoutResolutionPacket(this.menu.contentHolder.id(), method, menu.currentCardUUID));
         super.onClose();
     }
 
     private void onCancelTransaction() {
-        Numismatics.LOGGER.info("Submitting resolution (DENIED) of deferred order {}", this.menu.contentHolder.id);
-        CatnipServices.NETWORK.sendToServer(new DeferredCheckoutResolutionPacket(this.menu.contentHolder.id, CheckoutPaymentMethod.UNDEFINED, Utils.emptyUUID));
+        Numismatics.LOGGER.info("Submitting resolution (DENIED) of deferred order {}", this.menu.contentHolder.id());
+        CatnipServices.NETWORK.sendToServer(new DeferredCheckoutResolutionPacket(this.menu.contentHolder.id(), CheckoutPaymentMethod.UNDEFINED, Utils.emptyUUID));
         super.onClose();
     }
 
@@ -153,7 +153,7 @@ public class CheckoutScreen extends AbstractSimiContainerScreen<CheckoutMenu> {
 
         graphics.drawCenteredString(font, title, x + (background.width - 8) / 2, y + 3, 0xFFFFFF);
 
-        Couple<Integer> cogsAndSpurs = Coin.COG.convert(menu.contentHolder.costInSpurs);
+        Couple<Integer> cogsAndSpurs = Coin.COG.convert(menu.contentHolder.costInSpurs());
         int cogs = cogsAndSpurs.getFirst();
         int spurs = cogsAndSpurs.getSecond();
         Component balanceLabel = Component.translatable("gui.numismatics.checkout_screen.total",

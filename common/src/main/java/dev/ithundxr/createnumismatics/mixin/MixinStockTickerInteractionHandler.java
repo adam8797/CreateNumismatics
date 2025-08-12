@@ -5,6 +5,7 @@ import com.simibubi.create.content.logistics.stockTicker.StockTickerBlockEntity;
 import com.simibubi.create.content.logistics.stockTicker.StockTickerInteractionHandler;
 import com.simibubi.create.content.logistics.tableCloth.ShoppingListItem;
 import dev.ithundxr.createnumismatics.Numismatics;
+import dev.ithundxr.createnumismatics.content.checkout.DeferredCheckoutOrderMenuProvider;
 import dev.ithundxr.createnumismatics.util.Utils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerPlayer;
@@ -41,7 +42,8 @@ public class MixinStockTickerInteractionHandler {
         // and we will *not* be allowing the standard trade to complete now. We must defer it
         ci.cancel();
 
-        Utils.openScreen((ServerPlayer) player, deferredOrder, deferredOrder::sendToMenu);
+        var deferredOrderModel = new DeferredCheckoutOrderMenuProvider(deferredOrder.id, deferredOrder.costInSpurs);
+        Utils.openScreen((ServerPlayer) player, deferredOrderModel, deferredOrderModel::sendToMenu);
     }
 
 }

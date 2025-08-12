@@ -13,7 +13,7 @@ import java.util.UUID;
 
 public class GlobalDeferredCheckoutOrderManager {
 
-    private Map<UUID, DeferredCheckoutOrder> deferredOrders = new HashMap<>();
+    private final Map<UUID, DeferredCheckoutOrder> deferredOrders = new HashMap<>();
 
     private void warnIfClient() {
         if (Thread.currentThread().getName().equals("Render thread")) {
@@ -44,7 +44,7 @@ public class GlobalDeferredCheckoutOrderManager {
 
     public void voidOrder(DeferredCheckoutOrder order) {
         warnIfClient();
-        order.finalized = true;
+        order.close();
         deferredOrders.remove(order.id);
     }
 }

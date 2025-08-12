@@ -24,8 +24,7 @@ import java.util.UUID;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-public class CheckoutMenu extends MenuBase<DeferredCheckoutOrder> {
-    protected ContainerData dataAccess;
+public class CheckoutMenu extends MenuBase<DeferredCheckoutOrderMenuProvider> {
     private CheckoutMenu.CardSwitchContainer cardSwitchContainer;
     protected UUID currentCardUUID = Utils.emptyUUID;
 
@@ -33,22 +32,17 @@ public class CheckoutMenu extends MenuBase<DeferredCheckoutOrder> {
         super(type, id, inv, extraData);
     }
 
-    public CheckoutMenu(MenuType<?> type, int id, Inventory inv, DeferredCheckoutOrder contentHolder, ContainerData dataAccess) {
+    public CheckoutMenu(MenuType<?> type, int id, Inventory inv, DeferredCheckoutOrderMenuProvider contentHolder) {
         super(type, id, inv, contentHolder);
-        this.dataAccess = dataAccess;
-        addDataSlots(dataAccess);
     }
 
     @Override
-    protected DeferredCheckoutOrder createOnClient(RegistryFriendlyByteBuf extraData) {
-        DeferredCheckoutOrder account = DeferredCheckoutOrder.clientSide(extraData);
-        this.dataAccess = account.dataAccess;
-        addDataSlots(dataAccess);
-        return account;
+    protected DeferredCheckoutOrderMenuProvider createOnClient(RegistryFriendlyByteBuf extraData) {
+        return DeferredCheckoutOrderMenuProvider.clientSide(extraData);
     }
 
     @Override
-    protected void initAndReadInventory(DeferredCheckoutOrder contentHolder) {
+    protected void initAndReadInventory(DeferredCheckoutOrderMenuProvider contentHolder) {
     }
 
     @Override
@@ -64,7 +58,7 @@ public class CheckoutMenu extends MenuBase<DeferredCheckoutOrder> {
     }
 
     @Override
-    protected void saveData(DeferredCheckoutOrder contentHolder) {
+    protected void saveData(DeferredCheckoutOrderMenuProvider contentHolder) {
     }
 
     @Override
@@ -82,16 +76,15 @@ public class CheckoutMenu extends MenuBase<DeferredCheckoutOrder> {
         if (!clickedSlot.hasItem())
             return ItemStack.EMPTY;
 
-        ItemStack slotStack = CoinItem.clearDisplayedCount(clickedSlot.getItem());
-        ItemStack returnStack = slotStack.copy();
-
-        if (slotStack.isEmpty()) {
-            clickedSlot.set(ItemStack.EMPTY);
-        } else {
-            clickedSlot.setChanged();
+        if (NumismaticsTags.AllItemTags.CARDS.matches(clickedSlot.getItem()))
+        {
+            if (index == 0) // They've clicked the card in the slot
+                moveItemStackTo(clickedSlot.getItem(), 1, player.getInventory().getContainerSize() + 1, false);
+            else // They've clicked a card in their inventory
+                moveItemStackTo(clickedSlot.getItem(), 0, 1, false);
         }
 
-        return returnStack;
+        return ItemStack.EMPTY;
     }
 
     private class CardSwitchContainer implements Container {
