@@ -292,19 +292,18 @@ public class DeferredCheckoutOrder implements MenuProvider {
         return false;
     }
 
-
-    private static AbstractDepositorBlockEntity getDepositor(BlockPos tickerPos, Level level) {
+    private AbstractDepositorBlockEntity getDepositor() {
         for (Direction side : Iterate.horizontalDirections) {
-            BlockPos pos = tickerPos.relative(side);
+            BlockPos pos = stockTicker.getBlockPos().relative(side);
             var e = level.getBlockEntity(pos);
-            if (e instanceof AbstractDepositorBlockEntity)
-                return (AbstractDepositorBlockEntity) e;
+            if (e instanceof AbstractDepositorBlockEntity depositor)
+                return depositor;
         }
         return null;
     }
 
     private void depositCoinsToMerchant() {
-        var depositor = getDepositor(stockTicker.getBlockPos(), level);
+        var depositor = getDepositor();
         if (depositor == null)
             return;
 
