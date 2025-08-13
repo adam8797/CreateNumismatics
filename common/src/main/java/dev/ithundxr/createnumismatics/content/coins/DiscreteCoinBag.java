@@ -131,6 +131,12 @@ public class DiscreteCoinBag implements CoinBag {
         return bag;
     }
 
+    public static DiscreteCoinBag ofChange(int costInSpurs, Coin coinToBreak)
+    {
+        return DiscreteCoinBag.ofGreedy(coinToBreak.value - costInSpurs);
+    }
+
+
     public static DiscreteCoinBag of() {
         return new DiscreteCoinBag();
     }

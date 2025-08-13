@@ -205,15 +205,7 @@ public class DeferredCheckoutOrder{
 
             // Use one breaker coin
             toRemove.add(breaker, 1);
-            int overpay = breaker.value - remaining;
-
-            // Make change
-            changeToAdd = DiscreteCoinBag.ofGreedy(overpay);
-            overpay -= changeToAdd.getValue();
-            // If we couldn't form exact change (shouldn't happen with canonical set), fail safely
-            if (overpay != 0) {
-                return false;
-            }
+            changeToAdd = DiscreteCoinBag.ofChange(remaining, breaker);
         }
 
         // 4. Apply Changes
@@ -283,13 +275,11 @@ public class DeferredCheckoutOrder{
         }
     }
 
-    public void close()
-    {
+    public void close() {
         closed = true;
     }
 
-    public DeferredCheckoutOrderMenuProvider createMenuProvider()
-    {
+    public DeferredCheckoutOrderMenuProvider createMenuProvider() {
         return new DeferredCheckoutOrderMenuProvider(id, costInSpurs);
     }
 }
