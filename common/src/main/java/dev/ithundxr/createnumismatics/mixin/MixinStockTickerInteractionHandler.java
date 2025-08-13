@@ -31,7 +31,8 @@ public class MixinStockTickerInteractionHandler {
     ) {
 
         // Build the deferred order and check to see if all preconditions are being met
-        var deferredOrder = Numismatics.DEFERRED_ORDERS.deferOrder(shoppingList, level, (ServerPlayer) player, tickerBE);
+        var address = ShoppingListItem.getAddress(mainHandItem);
+        var deferredOrder = Numismatics.DEFERRED_ORDERS.deferOrder(shoppingList, level, (ServerPlayer) player, tickerBE, address);
         if (!deferredOrder.isTransactionValid()) {
             // Transaction isn't valid, backout!
             Numismatics.DEFERRED_ORDERS.voidOrder(deferredOrder);

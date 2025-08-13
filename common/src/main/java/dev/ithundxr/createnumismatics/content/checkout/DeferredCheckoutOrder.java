@@ -43,8 +43,9 @@ public class DeferredCheckoutOrder{
     private final Level level;
     private final InventorySummary itemCost;
     private final PackageOrder deferredOrder;
+    private final String packageAddress;
 
-    public DeferredCheckoutOrder(UUID orderId, ShoppingListItem.ShoppingList list, Level level, ServerPlayer player, StockTickerBlockEntity stockTicker) {
+    public DeferredCheckoutOrder(UUID orderId, ShoppingListItem.ShoppingList list, Level level, ServerPlayer player, StockTickerBlockEntity stockTicker, String packageAddress) {
         Couple<InventorySummary> bakeEntries = list.bakeEntries(level, null);
         InventorySummary paymentEntries = bakeEntries.getSecond();
 
@@ -64,6 +65,7 @@ public class DeferredCheckoutOrder{
         this.level = level;
         this.player = player;
         this.stockTicker = stockTicker;
+        this.packageAddress = packageAddress;
     }
 
     public boolean isTransactionValid() {
@@ -128,11 +130,11 @@ public class DeferredCheckoutOrder{
             }
 
             // If there's no item cost, we can skip a lot of the default create interaction, and just submit the order
-            CheckoutUtilities.shopInteractionSubmitToNetwork(stockTicker, deferredOrder, player, level);
+            CheckoutUtilities.shopInteractionSubmitToNetwork(stockTicker, deferredOrder, player, level, packageAddress);
         } else {
             // There are item costs in the shopping list, so we must submit the order through the standard pipeline.
             var receivedPayments = ((MixinStockTickerBlockEntityReceivedPaymentsAccessor) stockTicker).getReceivedPayments();
-            if (!CheckoutUtilities.finishShopInteractionStock(stockTicker, level, player, itemCost, deferredOrder, receivedPayments)) {
+            if (!CheckoutUtilities.finishShopInteractionStock(stockTicker, level, player, itemCost, deferredOrder, receivedPayments, packageAddress)) {
                 // stock checkout failed, cancel the transaction
                 return false;
             }

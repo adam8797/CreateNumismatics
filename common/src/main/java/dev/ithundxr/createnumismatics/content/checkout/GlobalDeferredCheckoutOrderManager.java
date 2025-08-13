@@ -30,9 +30,9 @@ public class GlobalDeferredCheckoutOrderManager {
         }
     }
 
-    public DeferredCheckoutOrder deferOrder(ShoppingListItem.ShoppingList list, Level level, ServerPlayer player, StockTickerBlockEntity stockTicker) {
+    public DeferredCheckoutOrder deferOrder(ShoppingListItem.ShoppingList list, Level level, ServerPlayer player, StockTickerBlockEntity stockTicker, String packageAddress) {
         warnIfClient();
-        var order = new DeferredCheckoutOrder(UUID.randomUUID(), list, level, player, stockTicker);
+        var order = new DeferredCheckoutOrder(UUID.randomUUID(), list, level, player, stockTicker, packageAddress);
         deferredOrders.put(order.id, order);
         return order;
     }

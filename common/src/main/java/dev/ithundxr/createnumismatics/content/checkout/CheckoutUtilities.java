@@ -9,6 +9,7 @@ import com.simibubi.create.content.logistics.stockTicker.StockTickerBlockEntity;
 import com.simibubi.create.content.logistics.tableCloth.ShoppingListItem;
 import com.simibubi.create.foundation.item.SmartInventory;
 import com.simibubi.create.foundation.utility.CreateLang;
+import dev.ithundxr.createnumismatics.Numismatics;
 import dev.ithundxr.createnumismatics.content.coins.CoinItem;
 import net.createmod.catnip.data.Couple;
 import net.createmod.catnip.data.Iterate;
@@ -23,18 +24,15 @@ import net.neoforged.neoforge.items.ItemHandlerHelper;
 import java.util.ArrayList;
 import java.util.List;
 
+/*
+    This class mostly contains code extracted from
+    com.simibubi.create.content.logistics.stockTicker.StockTickerInteractionHandler.interactWithShop()
+    in order to facilitate deferring the order placement. We need to call different parts of that one function at different times.
+
+    As such, it has been isolated to its own class. If the interactWithShop() function changes, most of the impact
+    will be to this file, and the mixin which kicks off the whole deferred checkout process
+ */
 public class CheckoutUtilities {
-    public static int determineCoinCostInSpurs(ShoppingListItem.ShoppingList list, Level level) {
-        Couple<InventorySummary> bakeEntries = list.bakeEntries(level, null);
-        InventorySummary paymentEntries = bakeEntries.getSecond();
-        int cost = 0;
-        for (var stack : paymentEntries.getStacksByCount()) {
-            if (stack.stack.getItem() instanceof CoinItem coinItem) {
-                cost += coinItem.coin.toSpurs(stack.count);
-            }
-        }
-        return cost;
-    }
 
     public static void denyShopInteraction(Level level, Player player) {
         AllSoundEvents.DENY.playOnServer(level, player.blockPosition());
@@ -43,10 +41,10 @@ public class CheckoutUtilities {
                 .sendStatus(player);
     }
 
-    public static void shopInteractionSubmitToNetwork(StockTickerBlockEntity tickerBE, PackageOrder order, Player player, Level level) {
-        var mainHandItem = player.getMainHandItem();
-        tickerBE.broadcastPackageRequest(LogisticallyLinkedBehaviour.RequestType.PLAYER, order, null, ShoppingListItem.getAddress(mainHandItem));
-        player.setItemInHand(InteractionHand.MAIN_HAND, ItemStack.EMPTY);
+    public static void shopInteractionSubmitToNetwork(StockTickerBlockEntity tickerBE, PackageOrder order, Player player, Level level, String packageAddress) {
+        tickerBE.broadcastPackageRequest(LogisticallyLinkedBehaviour.RequestType.PLAYER, order, null, packageAddress);
+        if (player.getItemInHand(InteractionHand.MAIN_HAND).getItem() instanceof ShoppingListItem)
+            player.setItemInHand(InteractionHand.MAIN_HAND, ItemStack.EMPTY);
         if (!order.isEmpty())
             AllSoundEvents.STOCK_TICKER_TRADE.playOnServer(level, tickerBE.getBlockPos());
     }
@@ -67,13 +65,18 @@ public class CheckoutUtilities {
         return true;
     }
 
+    /*
+     The "Stock" in the name of this function refers to "Standard" as in this is what we'll call to invoke the standard
+     process of placing an order if the order also contains items, instead of just coins.
+    */
     public static boolean finishShopInteractionStock(
             StockTickerBlockEntity tickerBE,
             Level level,
             Player player,
             InventorySummary paymentEntries,
             PackageOrder order,
-            SmartInventory receivedPayments) {
+            SmartInventory receivedPayments,
+            String packageAddress) {
         if (!checkOrderPreconditions(tickerBE, order, level, player))
             return false;
 
@@ -127,7 +130,7 @@ public class CheckoutUtilities {
             toTransfer.forEach(s -> ItemHandlerHelper.insertItemStacked(receivedPayments, s, false));
         }
 
-        shopInteractionSubmitToNetwork(tickerBE, order, player, level);
+        shopInteractionSubmitToNetwork(tickerBE, order, player, level, packageAddress);
         return true;
     }
 
