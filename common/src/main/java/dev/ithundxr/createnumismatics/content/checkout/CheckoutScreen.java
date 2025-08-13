@@ -115,7 +115,7 @@ public class CheckoutScreen extends AbstractSimiContainerScreen<CheckoutMenu> {
 
     private void onCancelTransaction() {
         Numismatics.LOGGER.info("Submitting resolution (DENIED) of deferred order {}", this.menu.contentHolder.id());
-        CatnipServices.NETWORK.sendToServer(new DeferredCheckoutResolutionPacket(this.menu.contentHolder.id(), CheckoutPaymentMethod.UNDEFINED, Utils.emptyUUID));
+        CatnipServices.NETWORK.sendToServer(new DeferredCheckoutResolutionPacket(this.menu.contentHolder.id(), CheckoutPaymentMethod.CANCEL_TRANSACTION, Utils.emptyUUID));
         super.onClose();
     }
 

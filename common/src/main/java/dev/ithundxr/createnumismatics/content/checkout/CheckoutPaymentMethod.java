@@ -5,7 +5,7 @@ import net.createmod.catnip.codecs.stream.CatnipStreamCodecBuilders;
 import net.minecraft.network.codec.StreamCodec;
 
 public enum CheckoutPaymentMethod {
-    UNDEFINED,
+    CANCEL_TRANSACTION,
     CARD,
     COINS;
 

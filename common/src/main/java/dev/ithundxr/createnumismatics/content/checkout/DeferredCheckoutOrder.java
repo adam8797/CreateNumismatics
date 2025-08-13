@@ -91,7 +91,7 @@ public class DeferredCheckoutOrder{
     }
 
     public boolean completePurchase(CheckoutPaymentMethod method, UUID purchasingAccountId) {
-        if (method == CheckoutPaymentMethod.UNDEFINED)
+        if (method == CheckoutPaymentMethod.CANCEL_TRANSACTION)
             return false;
 
         BankAccount account = null;
