@@ -11,33 +11,25 @@ import dev.ithundxr.createnumismatics.content.coins.CoinItem;
 import dev.ithundxr.createnumismatics.content.coins.DiscreteCoinBag;
 import dev.ithundxr.createnumismatics.content.depositor.AbstractDepositorBlockEntity;
 import dev.ithundxr.createnumismatics.mixin.MixinStockTickerBlockEntityReceivedPaymentsAccessor;
-import dev.ithundxr.createnumismatics.registry.NumismaticsMenuTypes;
 import dev.ithundxr.createnumismatics.util.Utils;
 import net.createmod.catnip.data.Couple;
 import net.createmod.catnip.data.Iterate;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Inventory;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.inventory.AbstractContainerMenu;
-import net.minecraft.world.inventory.ContainerData;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.UUID;
 
 public class DeferredCheckoutOrder{
     public UUID id;
-    public int costInSpurs;
 
     private boolean closed = false;
 
+    private final int costInSpurs;
     private final StockTickerBlockEntity stockTicker;
     private final ServerPlayer player;
     private final Level level;
@@ -51,13 +43,15 @@ public class DeferredCheckoutOrder{
 
         // Determine cost of coin component of order
         InventorySummary paymentWithoutCoins = new InventorySummary();
+        int cost = 0;
         for (var stack : paymentEntries.getStacksByCount()) {
             if (stack.stack.getItem() instanceof CoinItem coinItem) {
-                costInSpurs += coinItem.coin.toSpurs(stack.count);
+                cost += coinItem.coin.toSpurs(stack.count);
             } else {
                 paymentWithoutCoins.add(stack);
             }
         }
+        costInSpurs = cost;
 
         this.id = orderId;
         this.itemCost = paymentWithoutCoins;
@@ -294,8 +288,8 @@ public class DeferredCheckoutOrder{
         closed = true;
     }
 
-    public boolean isClosed()
+    public DeferredCheckoutOrderMenuProvider createMenuProvider()
     {
-        return closed;
+        return new DeferredCheckoutOrderMenuProvider(id, costInSpurs);
     }
 }

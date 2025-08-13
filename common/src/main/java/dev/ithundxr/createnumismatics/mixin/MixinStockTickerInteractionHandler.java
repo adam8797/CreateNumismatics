@@ -43,7 +43,7 @@ public class MixinStockTickerInteractionHandler {
         // and we will *not* be allowing the standard trade to complete now. We must defer it
         ci.cancel();
 
-        var deferredOrderModel = new DeferredCheckoutOrderMenuProvider(deferredOrder.id, deferredOrder.costInSpurs);
+        var deferredOrderModel = deferredOrder.createMenuProvider();
         Utils.openScreen((ServerPlayer) player, deferredOrderModel, deferredOrderModel::sendToMenu);
     }
 
