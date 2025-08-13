@@ -106,6 +106,12 @@ public class DeferredCheckoutOrder{
                 Numismatics.LOGGER.warn("Attempted to complete a card transaction {} with an non-empty, but invalid bank account {}", id, purchasingAccountId);
                 return false;
             }
+
+            if (!account.isAuthorized(player)) {
+                CheckoutUtilities.denyPurchase(level, player, "stock_keeper.too_broke"); // Unauthorized
+                return false;
+            }
+
         }
 
         if (!isTransactionValid()) {
