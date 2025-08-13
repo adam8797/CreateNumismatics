@@ -76,7 +76,7 @@ public class DiscreteCoinBag implements CoinBag {
         return NumismaticsItems.getCoin(coin).asStack(amt);
     }
 
-    public Map<Coin, Integer> asMap() { return this.coins; }
+    public Map<Coin, Integer> asMap() { return new HashMap<>(this.coins); }
 
     @Override
     public int getValue() {
