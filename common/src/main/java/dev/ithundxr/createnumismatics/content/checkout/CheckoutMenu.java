@@ -3,7 +3,6 @@ package dev.ithundxr.createnumismatics.content.checkout;
 import com.simibubi.create.foundation.gui.menu.MenuBase;
 import dev.ithundxr.createnumismatics.content.bank.CardItem;
 import dev.ithundxr.createnumismatics.content.bank.CardSlot;
-import dev.ithundxr.createnumismatics.content.coins.CoinItem;
 import dev.ithundxr.createnumismatics.registry.NumismaticsTags;
 import dev.ithundxr.createnumismatics.util.Utils;
 import net.minecraft.network.RegistryFriendlyByteBuf;
@@ -12,7 +11,6 @@ import net.minecraft.world.Container;
 import net.minecraft.world.ContainerHelper;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.inventory.ContainerData;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
@@ -58,6 +56,19 @@ public class CheckoutMenu extends MenuBase<DeferredCheckoutOrderMenuProvider> {
     }
 
     @Override
+    protected void addPlayerSlots(int x, int y) {
+        for (int hotbarSlot = 0; hotbarSlot < 9; ++hotbarSlot) {
+            this.addSlot(new LockableSlot(playerInventory, hotbarSlot, x + hotbarSlot * 18, y + 58, hotbarSlot == playerInventory.selected));
+        }
+        for (int row = 0; row < 3; ++row) {
+            for (int col = 0; col < 9; ++col) {
+                int slot = col + row * 9 + 9;
+                this.addSlot(new LockableSlot(playerInventory, slot, x + col * 18, y + row * 18, slot == playerInventory.selected));
+            }
+        }
+    }
+
+    @Override
     protected void saveData(DeferredCheckoutOrderMenuProvider contentHolder) {
     }
 
@@ -76,8 +87,7 @@ public class CheckoutMenu extends MenuBase<DeferredCheckoutOrderMenuProvider> {
         if (!clickedSlot.hasItem())
             return ItemStack.EMPTY;
 
-        if (NumismaticsTags.AllItemTags.CARDS.matches(clickedSlot.getItem()))
-        {
+        if (NumismaticsTags.AllItemTags.CARDS.matches(clickedSlot.getItem())) {
             if (index == 0) // They've clicked the card in the slot
                 moveItemStackTo(clickedSlot.getItem(), 1, player.getInventory().getContainerSize() + 1, false);
             else // They've clicked a card in their inventory
