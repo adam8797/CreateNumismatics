@@ -10,10 +10,12 @@ import com.simibubi.create.content.logistics.tableCloth.ShoppingListItem;
 import com.simibubi.create.foundation.item.SmartInventory;
 import com.simibubi.create.foundation.utility.CreateLang;
 import dev.ithundxr.createnumismatics.Numismatics;
+import dev.ithundxr.createnumismatics.base.data.lang.NumismaticsLangGen;
 import dev.ithundxr.createnumismatics.content.coins.CoinItem;
 import net.createmod.catnip.data.Couple;
 import net.createmod.catnip.data.Iterate;
 import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
@@ -34,13 +36,6 @@ import java.util.List;
  */
 public class CheckoutUtilities {
 
-    public static void denyShopInteraction(Level level, Player player) {
-        AllSoundEvents.DENY.playOnServer(level, player.blockPosition());
-        CreateLang.translate("stock_keeper.stock_level_too_low")
-                .style(ChatFormatting.RED)
-                .sendStatus(player);
-    }
-
     public static void shopInteractionSubmitToNetwork(StockTickerBlockEntity tickerBE, PackageOrder order, Player player, Level level, String packageAddress) {
         tickerBE.broadcastPackageRequest(LogisticallyLinkedBehaviour.RequestType.PLAYER, order, null, packageAddress);
         if (player.getItemInHand(InteractionHand.MAIN_HAND).getItem() instanceof ShoppingListItem)
@@ -59,7 +54,7 @@ public class CheckoutUtilities {
             if (recentSummary.getCountOf(entry.stack) >= entry.count)
                 continue;
 
-            denyShopInteraction(level, player);
+            denyPurchase(level, player, "create.stock_keeper.stock_level_too_low");
             return false;
         }
         return true;
@@ -90,7 +85,7 @@ public class CheckoutUtilities {
                 occupiedSlots--;
 
         if (occupiedSlots > 0) {
-            denyPurchase(level, player, "stock_keeper.cash_register_full");
+            denyPurchase(level, player, "create.stock_keeper.cash_register_full");
             return false;
         }
 
@@ -120,7 +115,7 @@ public class CheckoutUtilities {
             }
 
             if (simulate && tally.getTotalCount() != 0) {
-                denyPurchase(level, player, "stock_keeper.too_broke");
+                denyPurchase(level, player, "create.stock_keeper.too_broke");
                 return false;
             }
 
@@ -136,8 +131,6 @@ public class CheckoutUtilities {
 
     public static void denyPurchase(Level level, Player player, String langKey) {
         AllSoundEvents.DENY.playOnServer(level, player.blockPosition());
-        CreateLang.translate(langKey)
-                .style(ChatFormatting.RED)
-                .sendStatus(player);
+        player.displayClientMessage(Component.translatable(langKey).withStyle(ChatFormatting.RED), true);
     }
 }

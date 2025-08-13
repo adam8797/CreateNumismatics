@@ -108,10 +108,9 @@ public class DeferredCheckoutOrder{
             }
 
             if (!account.isAuthorized(player)) {
-                CheckoutUtilities.denyPurchase(level, player, "stock_keeper.too_broke"); // Unauthorized
+                CheckoutUtilities.denyPurchase(level, player, "numismatics.checkout.unauthorized"); // Unauthorized
                 return false;
             }
-
         }
 
         if (!isTransactionValid()) {
@@ -121,17 +120,17 @@ public class DeferredCheckoutOrder{
 
         if (itemCost.isEmpty()) {
             if (!CheckoutUtilities.checkOrderPreconditions(stockTicker, deferredOrder, level, player)) {
-                CheckoutUtilities.denyPurchase(level, player, "stock_keeper.too_broke");
+                // checkOrderPreconditions displays the chat message
                 return false;
             }
 
             if (method == CheckoutPaymentMethod.CARD && account.getBalance() < costInSpurs) {
-                CheckoutUtilities.denyPurchase(level, player, "stock_keeper.too_broke");
+                CheckoutUtilities.denyPurchase(level, player, "numismatics.checkout.insufficient_funds");
                 return false;
             }
 
             if (method == CheckoutPaymentMethod.COINS && !playerHasEnoughCoinsInInventory(player.getInventory(), costInSpurs)) {
-                CheckoutUtilities.denyPurchase(level, player, "stock_keeper.too_broke");
+                CheckoutUtilities.denyPurchase(level, player, "create.stock_keeper.too_broke");
                 return false;
             }
 
@@ -148,7 +147,10 @@ public class DeferredCheckoutOrder{
 
         switch (method) {
             case CARD -> account.deduct(costInSpurs);
-            case COINS -> tryPayInSpurs(player.getInventory(), costInSpurs);
+            case COINS -> {
+                if (!tryPayInSpurs(player.getInventory(), costInSpurs))
+                    Numismatics.LOGGER.warn("Attempted to pay {} spurs from player {} ({}) inventory, but failed!", costInSpurs, player.getName(), player.getUUID());
+            }
             default -> throw new IllegalStateException("Unexpected value: " + method);
         }
 

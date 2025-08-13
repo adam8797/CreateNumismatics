@@ -57,14 +57,14 @@ public class CheckoutScreen extends AbstractSimiContainerScreen<CheckoutMenu> {
         int gap = 6;
         int btnX = x + (background.width - btnW - 10) / 2;
 
-        payWithCoinsButton = Button.builder(Component.literal("Pay with Coins"), b -> onPayWithCoins())
+        payWithCoinsButton = Button.builder(Component.translatable("gui.numismatics.checkout_screen.pay_with_coins"), b -> onPayWithCoins())
                 .pos(btnX, y + 45)
                 .size(btnW, btnH)
                 .build();
         updatePayWithCoinsButton();
         addRenderableWidget(payWithCoinsButton);
 
-        payWithCardButton = Button.builder(Component.literal("Pay with Card"), b -> onPayWithCard())
+        payWithCardButton = Button.builder(Component.translatable("gui.numismatics.checkout_screen.pay_with_card"), b -> onPayWithCard())
                 .pos(btnX, y + 45 + btnH + gap)
                 .size(btnW - 24, btnH)
                 .build();
