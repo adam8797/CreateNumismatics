@@ -1,12 +1,12 @@
-// 1.21.1	2025-08-12T21:12:26.4579249	Registrate Provider for numismatics [Registries, Data Maps, Recipes, Advancements, Loot Tables, Tags (enchantments), Tags (blocks), Tags (items), Tags (fluids), Tags (entity_types), generic_server_provider, Blockstates, Item models, Lang (en_us/en_ud), generic_client_provider]
+// 1.21.1	2025-08-12T23:13:17.5266632	Registrate Provider for numismatics [Registries, Data Maps, Recipes, Advancements, Loot Tables, Tags (enchantments), Tags (blocks), Tags (items), Tags (fluids), Tags (entity_types), generic_server_provider, Blockstates, Item models, Lang (en_us/en_ud), generic_client_provider]
 f7f43dd6d567ec8303c73b79409bc92d8b56574a assets/numismatics/blockstates/andesite_depositor.json
 3961fdf3030140fc32e0e8c1d440ac395e62f5b6 assets/numismatics/blockstates/bank_terminal.json
 06ecd28cd97f4e8200dc396858695cad57b871c8 assets/numismatics/blockstates/blaze_banker.json
 160d556c6bfdb651082b39784258f6d06c21ca8f assets/numismatics/blockstates/brass_depositor.json
 95ef415a564eba1d212053195d25b199427b94e3 assets/numismatics/blockstates/creative_vendor.json
 d2b105f0657bad99b8efed45dc0a8df8ff775c10 assets/numismatics/blockstates/vendor.json
-da2ea46b51689cb1062f072ab847b8e164a414e2 assets/numismatics/lang/en_ud.json
-56639735048e12545395308eb903659b052b2d9e assets/numismatics/lang/en_us.json
+7876db60df471405f6593ff4e01569bc6e60c852 assets/numismatics/lang/en_ud.json
+0807126a759d0f21c95f49e53178463e07a491d8 assets/numismatics/lang/en_us.json
 265ef24d62bc7580e763e1fb6802bf4e58dc0194 assets/numismatics/models/block/andesite_depositor.json
 4f78ca868db20495aa20be7c6a14e2678fb16f9f assets/numismatics/models/block/andesite_depositor_locked.json
 411b79f79547a0adcb665bf7440e8169f7dcb24e assets/numismatics/models/block/brass_depositor.json
