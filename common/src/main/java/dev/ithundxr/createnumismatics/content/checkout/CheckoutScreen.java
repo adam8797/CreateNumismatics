@@ -29,7 +29,7 @@ import java.util.List;
 
 public class CheckoutScreen extends AbstractSimiContainerScreen<CheckoutMenu> {
     private final NumismaticsGuiTextures background = NumismaticsGuiTextures.CHECKOUT_SCREEN;
-    private final ItemStack renderedItem = AllBlocks.LIT_BLAZE_BURNER.asStack();
+    private final ItemStack renderedItem = AllBlocks.STOCK_TICKER.asStack();
     private List<Rect2i> extraAreas = Collections.emptyList();
 
     public CheckoutScreen(CheckoutMenu container, Inventory inv, Component title) {
