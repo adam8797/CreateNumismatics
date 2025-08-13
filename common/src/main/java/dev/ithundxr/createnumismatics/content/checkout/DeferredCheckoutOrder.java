@@ -21,10 +21,11 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.UUID;
 
-public class DeferredCheckoutOrder{
+public class DeferredCheckoutOrder {
     public UUID id;
 
     private boolean closed = false;
@@ -112,38 +113,74 @@ public class DeferredCheckoutOrder{
             return false;
         }
 
+        if (!CheckoutUtilities.checkOrderPreconditions(stockTicker, deferredOrder, level, player)) {
+            // checkOrderPreconditions displays the chat message
+            return false;
+        }
+
+        if (method == CheckoutPaymentMethod.CARD && account.getBalance() < costInSpurs) {
+            CheckoutUtilities.denyPurchase(level, player, "numismatics.checkout.insufficient_funds");
+            return false;
+        }
+
+        if (method == CheckoutPaymentMethod.COINS && !playerHasEnoughCoinsInInventory(player.getInventory(), costInSpurs)) {
+            CheckoutUtilities.denyPurchase(level, player, "create.stock_keeper.too_broke");
+            return false;
+        }
+
+        /*
+         So below, we do the transaction two different ways:
+         1) if its coins only, we can just skip a lot of steps, do the coin transaction, and submit the package order
+            directly to the system. Less points of failure, everyone wins.
+         2) if we need to take coins and money, we'll let Create take the items first, then we'll take the coins.
+            *in theory* this is safe because:
+              a) if its a card transaction, the account balance is sufficient, and the player is authorized
+              b) if its a coin transaction, the player has enough coins in their inventory to cover the cost.
+            but technically there is a logical flow here that could result in *someone* getting short changed.
+            If this does somehow occur, the player will get some free items. If this becomes an issue, we can split the order up
+            into two orders, one for coins and one for items, then submit them either back to back, or merge them and submit.
+        */
         if (itemCost.isEmpty()) {
-            if (!CheckoutUtilities.checkOrderPreconditions(stockTicker, deferredOrder, level, player)) {
-                // checkOrderPreconditions displays the chat message
+            if (!tryDoCoinTransaction(method, account)) {
+                Numismatics.LOGGER.warn("Failed to do a numismatics transaction, even though all the preconditions passed!");
+                CheckoutUtilities.denyPurchase(level, player, "numismatics.checkout.failure");
                 return false;
             }
 
-            if (method == CheckoutPaymentMethod.CARD && account.getBalance() < costInSpurs) {
-                CheckoutUtilities.denyPurchase(level, player, "numismatics.checkout.insufficient_funds");
-                return false;
-            }
-
-            if (method == CheckoutPaymentMethod.COINS && !playerHasEnoughCoinsInInventory(player.getInventory(), costInSpurs)) {
-                CheckoutUtilities.denyPurchase(level, player, "create.stock_keeper.too_broke");
-                return false;
-            }
-
-            // If there's no item cost, we can skip a lot of the default create interaction, and just submit the order
+            // If there's no item cost, we can skip a lot of the default create interaction. and just submit the order.
             CheckoutUtilities.shopInteractionSubmitToNetwork(stockTicker, deferredOrder, player, level, packageAddress);
         } else {
             // There are item costs in the shopping list, so we must submit the order through the standard pipeline.
+            // This could potentially fail because of the stock keeper being too full, so we'll submit the order, let it
+            // take any items as payment.
             var receivedPayments = ((MixinStockTickerBlockEntityReceivedPaymentsAccessor) stockTicker).getReceivedPayments();
             if (!CheckoutUtilities.finishShopInteractionStock(stockTicker, level, player, itemCost, deferredOrder, receivedPayments, packageAddress)) {
-                // stock checkout failed, cancel the transaction
+                return false;
+            }
+
+            if (!tryDoCoinTransaction(method, account)) {
+                Numismatics.LOGGER.warn("Failed to do a numismatics transaction, even though all the preconditions passed! " +
+                        "Unfortunately, the stock order has already been placed and we cannot unwind it.");
+                CheckoutUtilities.denyPurchase(level, player, "numismatics.checkout.failure");
                 return false;
             }
         }
+        return true;
+    }
 
+    private boolean tryDoCoinTransaction(CheckoutPaymentMethod method, @Nullable BankAccount account) {
         switch (method) {
-            case CARD -> account.deduct(costInSpurs);
+            case CARD -> {
+                if (account == null || !account.isAuthorized(player) || account.getBalance() < costInSpurs) {
+                    return false;
+                }
+                account.deduct(costInSpurs);
+            }
             case COINS -> {
-                if (!tryPayInSpurs(player.getInventory(), costInSpurs))
+                if (!tryPayInSpurs(player.getInventory(), costInSpurs)) {
                     Numismatics.LOGGER.warn("Attempted to pay {} spurs from player {} ({}) inventory, but failed!", costInSpurs, player.getName(), player.getUUID());
+                    return false;
+                }
             }
             default -> throw new IllegalStateException("Unexpected value: " + method);
         }
